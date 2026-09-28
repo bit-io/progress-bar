@@ -2,7 +2,7 @@
 -> name        => progress-bar
 -> version     => 1.0.0
 -> description => Bogata biblioteka pasków postępu i spinnerów dla H# — inspirowana indicatif (Rust) i podobnymi bibliotekami. Wbudowane motywy z Bytes + dziesiątki własnych, kompletna galeria spinnerów, MultiProgress, ETA/prędkość, szablony i w pełni własne style.
--> author      => Bytes Developers
+-> author      => Bit Developers
 -> license     => MIT
 
 [build]
