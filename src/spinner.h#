@@ -3,8 +3,8 @@ mod spinner_frames
 
 ;; spinner.h# — animowany spinner dla zadań, których długości nie znamy
 ;; (połączenie sieciowe, git clone, kompilacja...). Zachowuje się jak
-;; wbudowany `Spinner` z `bytes` (spinner_new/spinner_tick/spinner_finish w
-;; bytes/src/progress.h#), tylko z całą galerią stylów z
+;; wbudowany `Spinner` z `bit` (spinner_new/spinner_tick/spinner_finish w
+;; bit/src/progress.h#), tylko z całą galerią stylów z
 ;; spinner_frames.h# zamiast jednego, na stałe wpisanego zestawu klatek.
 ;;
 ;; Użycie:
