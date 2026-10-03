@@ -3,7 +3,7 @@ mod core
 ;; eta.h# — szacowanie czasu pozostałego (ETA) i prędkości.
 ;;
 ;; Prosty wariant (`eta_simple_ms`) liczy jedno globalne tempo "od startu"
-;; — dokładnie tak jak wbudowany pasek `bytes` (ms-na-element * to, co
+;; — dokładnie tak jak wbudowany pasek `bit` (ms-na-element * to, co
 ;; zostało). Działa dobrze, gdy tempo jest w miarę stałe.
 ;;
 ;; `SpeedTracker` to wariant "wygładzony" (jak ETA w `indicatif`): trzyma
