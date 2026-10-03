@@ -2,7 +2,7 @@ mod bar
 
 ;; multi.h# — kilka pasków postępu rysowanych naraz, jeden pod drugim,
 ;; zawsze "przypiętych" do ostatnich N linii terminala — dokładnie ten sam
-;; pomysł co `MultiBar` w `bytes` (bytes/src/progress.h#), tylko uogólniony
+;; pomysł co `MultiBar` w `bit` (bit/src/progress.h#), tylko uogólniony
 ;; z 3 stałych wierszy (status/pasek/akcja) na dowolną liczbę niezależnych
 ;; pasków. Idealne do np. równoległego pobierania kilku plików naraz.
 ;;
@@ -88,7 +88,12 @@ impl MultiProgress is
     pub fn inc(self, idx: int, n: int) -> MultiProgress is
         let current: bar::ProgressBar = self.bars[idx]
         let updated: bar::ProgressBar = current.inc(n)
-        return self.update(idx, updated).draw()
+        ;; Wynik wywołania metody trzymamy w zmiennej z jawnym typem: backend LLVM
+        ;; nie wnioskuje typu odbiorcy z `a.b(...).draw()`, a `draw` istnieje też
+        ;; w `ProgressBar` i `Spinner` — łańcuch dawał
+        ;; `no LLVM codegen for method call .draw(...)`.
+        let next: MultiProgress = self.update(idx, updated)
+        return next.draw()
     end
 
     ;; (Ponowne) narysowanie całego bloku. Pierwsze wywołanie po prostu
@@ -106,7 +111,7 @@ impl MultiProgress is
 
     ;; Wypisuje PRAWDZIWĄ, trwałą linię (ostrzeżenie, "gotowe: x.zip")
     ;; bezpośrednio NAD blokiem, po czym stawia blok z powrotem pod nią —
-    ;; bez przeplatania jej z animacją, tak jak `multibar_log` w `bytes`.
+    ;; bez przeplatania jej z animacją, tak jak `multibar_log` w `bit`.
     pub fn log(self, line: string) -> MultiProgress is
         let n: int = array_len(self.bars)
         if self.drawn && n > 0 is
