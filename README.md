@@ -1,20 +1,20 @@
-# progressbar
+# progress-bar
 
 Bogata biblioteka pasków postępu i spinnerów dla **H#**, inspirowana
 `indicatif` (Rust), `cli-spinners`/`cli-progress` i podobnymi bibliotekami
 znanymi z innych ekosystemów — ale w 100% napisana w H#, zgodna z
-konwencjami projektu `bytes` (pakiet-menedżer H#) i wbudowanym paskiem
-postępu, który `bytes` pokazuje przy instalacji.
+konwencjami projektu `bit` (pakiet-menedżer H#) i wbudowanym paskiem
+postępu, który `bit` pokazuje przy instalacji.
 
 ## Co dostajesz
 
 - **21 wbudowanych motywów paska** — w tym dokładnie te same 6, których
-  używa natywny pasek postępu w `bytes` (`default`, `arrow`, `dotted`,
+  używa natywny pasek postępu w `bit` (`default`, `arrow`, `dotted`,
   `cargo`, `equals`, `blocks`), plus 15 kolejnych: `ascii`, `fine`, `fine2`,
   `rough`, `github`, `retro`, `material`, `thin`, `hearts`, `stars`,
   `circles`, `hash`, `shade`, `double`, `minimal`.
 - **~39 wbudowanych spinnerów** — `dots` to dokładnie ten sam spinner co w
-  `bytes`; do tego dziesiątki kolejnych w duchu popularnych bibliotek
+  `bit`; do tego dziesiątki kolejnych w duchu popularnych bibliotek
   spinnerów: `line`, `arc`, `bouncing_ball`, `moon`, `earth`, `clock`,
   `weather`, `triangle`, `circle_half`, `toggle`, `wave`, `pulse` i wiele,
   wiele innych (pełna lista: `spinner_frames::spinner_names()`).
@@ -31,8 +31,8 @@ postępu, który `bytes` pokazuje przy instalacji.
   (ruchome okno próbek, jak w `indicatif`).
 - **W pełni fluent API** — `builder::new_bar(100, "Etykieta").theme("blocks").width(30).build()`.
 
-Cała biblioteka jest napisana w tym samym, sprawdzonym stylu co sam `bytes`
-(zob. `bytes/src/progress.h#`): stan trzymany w niemutowalnych structach,
+Cała biblioteka jest napisana w tym samym, sprawdzonym stylu co sam `bit`
+(zob. `bit/src/progress.h#`): stan trzymany w niemutowalnych structach,
 przekazywany dalej jako nowa wartość z każdej funkcji — żadnych ukrytych
 mutacji przez zmienne przechwycone w closures.
 
@@ -49,13 +49,13 @@ mod builder
 ;; ... i inne moduły, których używasz — patrz "Moduły" niżej
 ```
 
-Dokładnie tak samo, jak `bytes` sam siebie buduje z wielu plików w
-`bytes/src/` (`mod cli`, `mod config`, ...).
+Dokładnie tak samo, jak `bit` sam siebie buduje z wielu plików w
+`bit/src/` (`mod cli`, `mod config`, ...).
 
-**Wariant B — jako zależność `bytes` (gdy pakiet trafi do rejestru):**
+**Wariant B — jako zależność `bit` (gdy pakiet trafi do rejestru):**
 
 ```
-bytes add progressbar
+bit add progressbar
 ```
 
 a potem w kodzie (składnia importu jak dla pakietów z GitHuba w README H#):
@@ -125,7 +125,7 @@ Przykład własnego szablonu:
 
 ```
 let sty = style::style_default()
-    .with_template("{msg}\n{bar} {bytes}/{total_bytes}  {speed}/s  ETA {eta}")
+    .with_template("{{msg}}\n{{bar}} {{bytes}}/{{total_bytes}}  {{speed}}/s  ETA {{eta}}")
     .with_theme("blocks")
 ```
 
@@ -164,7 +164,7 @@ mp = mp.finish_all("Wszystkie pliki pobrane")
 ## Przykłady
 
 Katalog `examples/` zawiera 6 gotowych, samodzielnych mini-projektów
-`bytes` (każdy z zawendorowaną kopią biblioteki w swoim `src/`, więc
+`bit` (każdy z zawendorowaną kopią biblioteki w swoim `src/`, więc
 uruchamiają się od razu, bez dodatkowej konfiguracji):
 
 | katalog | co pokazuje |
@@ -179,7 +179,7 @@ uruchamiają się od razu, bez dodatkowej konfiguracji):
 Uruchomienie (z wnętrza katalogu przykładu):
 
 ```
-bytes run
+bit run
 ```
 
 albo bezpośrednio przez interpreter:
@@ -192,14 +192,14 @@ h# preview src/main.h#
 
 Testy (`#[test]`) są dopisane bezpośrednio w plikach, których dotyczą —
 `theme.h#`, `human.h#`, `template.h#` — zgodnie z konwencją H# pokazaną w
-jego README. Uruchomienie: `bytes test` (albo odpowiednik `h# check` z
+jego README. Uruchomienie: `bit test` (albo odpowiednik `h# check` z
 Twojej wersji narzędzia).
 
-## Zgodność z `bytes`
+## Zgodność z `bit`
 
 Sześć pierwszych motywów paska i spinner `dots` są renderowane identycznie
-jak natywny pasek postępu instalatora `bytes` — jeśli chcesz, żeby Twoje
-narzędzie CLI wyglądało spójnie z `bytes`, po prostu użyj
+jak natywny pasek postępu instalatora `bit` — jeśli chcesz, żeby Twoje
+narzędzie CLI wyglądało spójnie z `bit`, po prostu użyj
 `bar::bar_new(...)` (domyślny motyw = `default`) albo
 `spinner::spinner_new(...)` (domyślny zestaw = `dots`).
 
