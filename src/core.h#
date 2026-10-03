@@ -122,8 +122,8 @@ end
 ;; [WAŻNE] Moduły spoza core.h# (bar.h#, template.h#, spinner.h#, eta.h#...)
 ;; NIE czytają `.total`/`.current`/... bezpośrednio z wartości typu
 ;; `ProgressState` — czytają przez te funkcje. To dokładnie ten sam wzorzec
-;; co `reg_name`/`reg_git` w bytes/src/registry.h# i `member_success`/
-;; `member_bin_path` w bytes/src/progress.h#: odczyt pola structa
+;; co `reg_name`/`reg_git` w bit/src/registry.h# i `member_success`/
+;; `member_bin_path` w bit/src/progress.h#: odczyt pola structa
 ;; zadeklarowanego w INNYM module bywa (w tej wersji interpretera H#)
 ;; rozwiązywany przez dopasowanie nazwy pola po wszystkich znanych
 ;; structach zamiast po zadeklarowanym typie — co psuje się, gdy dwa
