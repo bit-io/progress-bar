@@ -82,27 +82,27 @@ pub fn format_thousands(n: int) -> string is
 end
 
 ;; ── Testy ────────────────────────────────────────────────────────────
-;; `bytes test` (albo `h# check`) znajduje te funkcje po atrybucie
+;; `bit test` (albo `h# check`) znajduje te funkcje po atrybucie
 ;; `#[test]` — dokładnie tak samo jak w przykładach z README H#.
 use "std -> test" from "test"
 
 #[test]
 fn test_format_bytes() is
-    assert_eq(format_bytes(512), "512 B")
-    assert_eq(format_bytes(1024), "1.0 KB")
-    assert_eq(format_bytes(1024 * 1024), "1.0 MB")
+    test::assert_eq(format_bytes(512), "512 B")
+    test::assert_eq(format_bytes(1024), "1.0 KB")
+    test::assert_eq(format_bytes(1024 * 1024), "1.0 MB")
 end
 
 #[test]
 fn test_format_duration_ms() is
-    assert_eq(format_duration_ms(500), "500ms")
-    assert_eq(format_duration_ms(1500), "1.5s")
-    assert_eq(format_duration_ms(65000), "1m 05s")
+    test::assert_eq(format_duration_ms(500), "500ms")
+    test::assert_eq(format_duration_ms(1500), "1.5s")
+    test::assert_eq(format_duration_ms(65000), "1m 05s")
 end
 
 #[test]
 fn test_format_thousands() is
-    assert_eq(format_thousands(999), "999")
-    assert_eq(format_thousands(1000), "1 000")
-    assert_eq(format_thousands(1234567), "1 234 567")
+    test::assert_eq(format_thousands(999), "999")
+    test::assert_eq(format_thousands(1000), "1 000")
+    test::assert_eq(format_thousands(1234567), "1 234 567")
 end
