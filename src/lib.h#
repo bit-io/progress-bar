@@ -10,7 +10,14 @@ mod spinner
 mod multi
 mod builder
 
-;; lib.h# — punkt wejścia pakietu `progressbar` (patrz `Bytes.hk`,
+;; Importy na poziomie pliku wejściowego są rozwiązywane przez każdą wersję
+;; kompilatora H# (import w pliku dołączonym przez `mod` działa dopiero od
+;; poprawki w `modules.rs`). Testy w `theme.h#`, `human.h#` i `template.h#`
+;; wołają `test::assert_eq(...)` — bez tej linii starszy `h#` kończył się na
+;; `codegen: undefined fn: assert_eq`.
+use "std -> test" from "test"
+
+;; lib.h# — punkt wejścia pakietu `progressbar` (patrz `Bit.hk`,
 ;; `entry => src/lib.h#`). Samo `mod ...` powyżej wciąga całą bibliotekę
 ;; do jednej jednostki kompilacji; poniżej kilka "szybkich skrótów" na
 ;; najczęstsze przypadki, żeby nie trzeba było za każdym razem osobno
@@ -34,11 +41,11 @@ mod builder
 ;;   end
 ;;
 ;; (Jeśli import międzypakietowy nie jest jeszcze wspierany w Twojej wersji
-;; `bytes`, po prostu skopiuj katalog `src/` do swojego projektu i zamiast
+;; `bit`, po prostu skopiuj katalog `src/` do swojego projektu i zamiast
 ;; `use ...` daj `mod bar` / `mod spinner` / ... tam, gdzie ich używasz —
 ;; patrz README.md, sekcja "Instalacja".)
 
-;; Zwykły pasek postępu z domyślnym stylem ("default" motyw z bytes).
+;; Zwykły pasek postępu z domyślnym stylem ("default" motyw z bit).
 pub fn quick_bar(total: int, label: string) -> bar::ProgressBar is
     return bar::bar_new(total, label)
 end
@@ -51,11 +58,11 @@ end
 ;; Pasek do pobierania plików: {msg} + {bar} + bajty + prędkość + ETA.
 pub fn quick_download_bar(total_bytes: int, label: string) -> bar::ProgressBar is
     return builder::new_bar(total_bytes, label).template(
-        "{msg}\n{bar} {bytes}/{total_bytes}  {speed}/s  ETA {eta}"
+        "{{msg}}\n{{bar}} {{bytes}}/{{total_bytes}}  {{speed}}/s  ETA {{eta}}"
     ).theme("blocks").build()
 end
 
-;; Spinner z domyślnym stylem "dots" (identyczny wizualnie z bytes).
+;; Spinner z domyślnym stylem "dots" (identyczny wizualnie z bit).
 pub fn quick_spinner(msg: string) -> spinner::Spinner is
     return spinner::spinner_new(msg)
 end
@@ -71,7 +78,7 @@ pub fn quick_multi() -> multi::MultiProgress is
 end
 
 ;; Lista wszystkich wbudowanych motywów paska (do np. własnego selektora
-;; w stylu `bytes settings`).
+;; w stylu `bit settings`).
 pub fn builtin_themes() -> [string] is
     return theme::theme_names()
 end
