@@ -102,7 +102,7 @@ impl ProgressBar is
     end
 
     ;; Domyka pasek do 100%, wypisuje finalną linię + komunikat sukcesu
-    ;; i przechodzi do nowej linii (tak jak `bar_finish` w `bytes`).
+    ;; i przechodzi do nowej linii (tak jak `bar_finish` w `bit`).
     pub fn finish(self, msg: string) -> ProgressBar is
         let done: ProgressBar = ProgressBar { state: core::state_finish(self.state), sty: self.sty }
         io_print("\r" + done.line() + "                    ")
