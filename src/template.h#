@@ -48,48 +48,48 @@ end
 pub fn render_full(tpl: string, state: core::ProgressState, theme_name: string, spinner_name: string, width: int, colored: bool) -> string is
     let mut out: string = tpl
 
-    if string_contains(out, "{bar}") is
-        out = string_replace_all(out, "{bar}", render_bar_only(state, theme_name, width, colored))
+    if string_contains(out, "{{bar}}") is
+        out = string_replace_all(out, "{{bar}}", render_bar_only(state, theme_name, width, colored))
     end
-    if string_contains(out, "{percent_bar}") is
-        out = string_replace_all(out, "{percent_bar}", render_bar_only(state, theme_name, width, colored))
+    if string_contains(out, "{{percent_bar}}") is
+        out = string_replace_all(out, "{{percent_bar}}", render_bar_only(state, theme_name, width, colored))
     end
-    if string_contains(out, "{spinner}") is
+    if string_contains(out, "{{spinner}}") is
         let frames: [string] = spinner_frames::spinner_frames(spinner_name)
         let frame: string = spinner_frames::spinner_frame_at(frames, core::state_tick_count(state))
-        out = string_replace_all(out, "{spinner}", frame)
+        out = string_replace_all(out, "{{spinner}}", frame)
     end
-    if string_contains(out, "{label}") is
-        out = string_replace_all(out, "{label}", core::state_label(state))
+    if string_contains(out, "{{label}}") is
+        out = string_replace_all(out, "{{label}}", core::state_label(state))
     end
-    if string_contains(out, "{msg}") is
-        out = string_replace_all(out, "{msg}", core::state_message(state))
+    if string_contains(out, "{{msg}}") is
+        out = string_replace_all(out, "{{msg}}", core::state_message(state))
     end
-    if string_contains(out, "{pos}") is
-        out = string_replace_all(out, "{pos}", to_string(core::state_current(state)))
+    if string_contains(out, "{{pos}}") is
+        out = string_replace_all(out, "{{pos}}", to_string(core::state_current(state)))
     end
-    if string_contains(out, "{len}") is
-        out = string_replace_all(out, "{len}", to_string(core::state_total(state)))
+    if string_contains(out, "{{len}}") is
+        out = string_replace_all(out, "{{len}}", to_string(core::state_total(state)))
     end
-    if string_contains(out, "{percent}") is
-        out = string_replace_all(out, "{percent}", to_string(core::state_percent(state)))
+    if string_contains(out, "{{percent}}") is
+        out = string_replace_all(out, "{{percent}}", to_string(core::state_percent(state)))
     end
-    if string_contains(out, "{elapsed}") is
-        out = string_replace_all(out, "{elapsed}", human::format_duration_ms(core::state_elapsed_ms(state)))
+    if string_contains(out, "{{elapsed}}") is
+        out = string_replace_all(out, "{{elapsed}}", human::format_duration_ms(core::state_elapsed_ms(state)))
     end
-    if string_contains(out, "{eta}") is
+    if string_contains(out, "{{eta}}") is
         let eta_ms: int = eta::eta_simple_ms(state)
         let eta_str: string = if eta_ms < 0 then "?" else human::format_duration_ms(eta_ms)
-        out = string_replace_all(out, "{eta}", eta_str)
+        out = string_replace_all(out, "{{eta}}", eta_str)
     end
-    if string_contains(out, "{bytes}") is
-        out = string_replace_all(out, "{bytes}", human::format_bytes(core::state_current(state)))
+    if string_contains(out, "{{bytes}}") is
+        out = string_replace_all(out, "{{bytes}}", human::format_bytes(core::state_current(state)))
     end
-    if string_contains(out, "{total_bytes}") is
-        out = string_replace_all(out, "{total_bytes}", human::format_bytes(core::state_total(state)))
+    if string_contains(out, "{{total_bytes}}") is
+        out = string_replace_all(out, "{{total_bytes}}", human::format_bytes(core::state_total(state)))
     end
-    if string_contains(out, "{speed}") is
-        out = string_replace_all(out, "{speed}", human::format_rate(core::state_rate_per_sec(state)))
+    if string_contains(out, "{{speed}}") is
+        out = string_replace_all(out, "{{speed}}", human::format_rate(core::state_rate_per_sec(state)))
     end
 
     return out
@@ -101,21 +101,21 @@ use "std -> test" from "test"
 #[test]
 fn test_render_full_percent_and_pos() is
     let s: core::ProgressState = core::state_set(core::state_new(50, "Test"), 25)
-    let out: string = render_full("{pos}/{len} ({percent}%)", s, "ascii", "dots", 10, false)
-    assert_eq(out, "25/50 (50%)")
+    let out: string = render_full("{{pos}}/{{len}} ({{percent}}%)", s, "ascii", "dots", 10, false)
+    test::assert_eq(out, "25/50 (50%)")
 end
 
 #[test]
 fn test_render_full_message_and_label() is
     let s0: core::ProgressState = core::state_new(10, "Zadanie")
     let s: core::ProgressState = core::state_set_message(s0, "działam")
-    let out: string = render_full("{label}: {msg}", s, "ascii", "dots", 10, false)
-    assert_eq(out, "Zadanie: działam")
+    let out: string = render_full("{{label}}: {{msg}}", s, "ascii", "dots", 10, false)
+    test::assert_eq(out, "Zadanie: działam")
 end
 
 #[test]
 fn test_render_full_bar_width() is
     let s: core::ProgressState = core::state_set(core::state_new(10, ""), 5)
-    let out: string = render_full("{bar}", s, "ascii", "dots", 10, false)
-    assert_eq(out, "[#####.....]")
+    let out: string = render_full("{{bar}}", s, "ascii", "dots", 10, false)
+    test::assert_eq(out, "[#####.....]")
 end
