@@ -8,7 +8,7 @@ end
 
 pub fn style_default() -> ProgressStyle is
     return ProgressStyle {
-        theme: "default", template: "{bar} {percent}% {msg}",
+        theme: "default", template: "{{bar}} {{percent}}% {{msg}}",
         spinner: "dots", width: 24, color: true,
     }
 end
@@ -73,27 +73,27 @@ pub fn style_bar() -> ProgressStyle is
 end
 
 pub fn style_bar_with_eta() -> ProgressStyle is
-    return style_default().with_template("{msg} {bar} {pos}/{len} ({percent}%) ETA {eta}")
+    return style_default().with_template("{{msg}} {{bar}} {{pos}}/{{len}} ({{percent}}%) ETA {{eta}}")
 end
 
 pub fn style_spinner() -> ProgressStyle is
-    return style_default().with_template("{spinner} {msg}").with_spinner("dots")
+    return style_default().with_template("{{spinner}} {{msg}}").with_spinner("dots")
 end
 
 pub fn style_download() -> ProgressStyle is
     return style_default()
         .with_theme("blocks")
-        .with_template("{msg}\n{bar} {bytes}/{total_bytes}  {speed}/s  ETA {eta}")
+        .with_template("{{msg}}\n{{bar}} {{bytes}}/{{total_bytes}}  {{speed}}/s  ETA {{eta}}")
 end
 
 pub fn style_minimal() -> ProgressStyle is
-    return style_default().with_theme("minimal").with_template("{bar} {percent}%")
+    return style_default().with_theme("minimal").with_template("{{bar}} {{percent}}%")
 end
 
 pub fn style_counter() -> ProgressStyle is
-    return style_default().with_template("{msg} [{pos}/{len}]")
+    return style_default().with_template("{{msg}} [{{pos}}/{{len}}]")
 end
 
 pub fn style_cargo() -> ProgressStyle is
-    return style_default().with_theme("cargo").with_template("{label} {bar} {percent}%  {msg}")
+    return style_default().with_theme("cargo").with_template("{{label}} {{bar}} {{percent}}%  {{msg}}")
 end
