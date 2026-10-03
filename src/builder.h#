@@ -51,7 +51,11 @@ impl ProgressBuilder is
     end
 
     pub fn no_color(self) -> ProgressBuilder is
-        return ProgressBuilder { total: self.total, label: self.label, sty: self.sty.no_color() }
+        ;; typowany lokal zamiast `self.sty.no_color()` — `no_color` ma też `ProgressBuilder`,
+        ;; więc backend LLVM musi znać typ odbiorcy już z deklaracji
+        let cur: style::ProgressStyle = self.sty
+        let plain: style::ProgressStyle = cur.no_color()
+        return ProgressBuilder { total: self.total, label: self.label, sty: plain }
     end
 
     pub fn length(self, total: int) -> ProgressBuilder is
