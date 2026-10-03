@@ -1,14 +1,27 @@
 [package]
 -> name        => progress-bar
 -> version     => 1.0.0
--> description => Bogata biblioteka pasków postępu i spinnerów dla H# — inspirowana indicatif (Rust) i podobnymi bibliotekami. Wbudowane motywy z Bytes + dziesiątki własnych, kompletna galeria spinnerów, MultiProgress, ETA/prędkość, szablony i w pełni własne style.
--> author      => Bit Developers
+-> description => Bogata biblioteka pasków postępu i spinnerów dla H# — inspirowana indicatif (Rust) i podobnymi bibliotekami. Wbudowane motywy z Bit + dziesiątki własnych, kompletna galeria spinnerów, MultiProgress, ETA/prędkość, szablony i w pełni własne style.
+-> authors     => ["Bit Developers"]
 -> license     => MIT
+-> lang        => h#
+
+[layout]
+-> src => src
 
 [build]
--> lang   => h#
--> entry  => src/lib.h#
--> output => build/libprogressbar
--> emit   => lib
+-> link => static
 
-[deps]
+[lib]
+-> output => hlib
+
+[default-build]
+-> profile => release
+
+[dependencies]
+
+
+[commands]
+-> test-all
+--> run => bit test
+--> description => Uruchom testy jednostkowe biblioteki
