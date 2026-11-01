@@ -1,5 +1,8 @@
 mod core
 mod spinner_frames
+mod human
+
+use "std -> test" from "test"
 
 ;; spinner.h# — animowany spinner dla zadań, których długości nie znamy
 ;; (połączenie sieciowe, git clone, kompilacja...). Zachowuje się jak
@@ -18,47 +21,101 @@ mod spinner_frames
 ;;       t::sleep_ms(80)
 ;;   end
 ;;   sp.finish("Połączono!")
+;;
+;; Z licznikiem czasu i kolorowym prefiksem (jak `bit`):
+;;
+;;   let mut sp = spinner::spinner_new("bit").with_elapsed(true).set_prefix("\x1b[1;31mH#\x1b[0m")
+;;   ...                         ⠹  [16s]  H# › bit
+;;   sp.finish("")               ✓  [18s]  H# › bit
+;;
+;; Czas liczony jest od utworzenia spinnera (`spinner_new`) i czytany z zegara przy KAŻDYM `draw()`,
+;; więc rośnie płynnie niezależnie od tego, jak często wołasz `tick()`.
 
 pub struct Spinner is
     pub state:         core::ProgressState
     pub name:          string      ;; nazwa zestawu klatek — spinner_frames.h#, albo "custom"
     pub color:         string      ;; kod koloru ANSI (np. "36" = cyan), "" = brak koloru
     pub custom_frames: [string]    ;; używane tylko gdy name == "custom" — patrz spinner_custom()
+    pub elapsed:       bool        ;; true = między klatką a komunikatem stoi licznik czasu `[16s]`
+    pub prefix:        string      ;; opcjonalny znacznik przed komunikatem (może zawierać ANSI), np. "H#"
+    pub sep:           string      ;; separator między prefiksem a komunikatem ("›"); "" = zwykła spacja
 end
 
 pub fn spinner_new(msg: string) -> Spinner is
-    return Spinner { state: core::state_set_message(core::state_new(0, ""), msg), name: "dots", color: "36", custom_frames: [] }
+    return Spinner { state: core::state_set_message(core::state_new(0, ""), msg), name: "dots", color: "36", custom_frames: [], elapsed: false, prefix: "", sep: "›" }
 end
 
 pub fn spinner_with_style(msg: string, frame_set: string) -> Spinner is
-    return Spinner { state: core::state_set_message(core::state_new(0, ""), msg), name: frame_set, color: "36", custom_frames: [] }
+    return Spinner { state: core::state_set_message(core::state_new(0, ""), msg), name: frame_set, color: "36", custom_frames: [], elapsed: false, prefix: "", sep: "›" }
 end
 
 ;; Własny, w pełni dowolny zestaw klatek — dowolne stringi (emoji, ASCII-art,
 ;; nawet wielokrokowe frazy), np. `spinner_custom("Budowanie…", ["[.  ]", "[.. ]", "[...]", "[ ..]", "[  .]"])`.
 pub fn spinner_custom(msg: string, frames: [string]) -> Spinner is
-    return Spinner { state: core::state_set_message(core::state_new(0, ""), msg), name: "custom", color: "36", custom_frames: frames }
+    return Spinner { state: core::state_set_message(core::state_new(0, ""), msg), name: "custom", color: "36", custom_frames: frames, elapsed: false, prefix: "", sep: "›" }
+end
+
+;; Spinner z licznikiem czasu i prefiksem od razu: `⠹  [16s]  prefix › msg`.
+pub fn spinner_timed(prefix: string, msg: string) -> Spinner is
+    return Spinner { state: core::state_set_message(core::state_new(0, ""), msg), name: "dots", color: "36", custom_frames: [], elapsed: true, prefix: prefix, sep: "›" }
+end
+
+;; Szerokość (w znakach) pola `[16s]` — krótsze są dopełniane spacjami, żeby komunikat nie
+;; przeskakiwał o kolumnę przy przejściu 9s -> 10s. Dłuższe (`[1m04s]`) wypychają go raz.
+fn elapsed_field_width() -> int is
+    return 5
+end
+
+;; Oklejenie zwykłego tekstu w kolor ANSI; "" = bez koloru.
+fn paint(code: string, text: string) -> string is
+    if code == "" is return text end
+    return "\x1b[" + code + "m" + text + "\x1b[0m"
 end
 
 impl Spinner is
     pub fn tick(self) -> Spinner is
-        return Spinner { state: core::state_tick(self.state), name: self.name, color: self.color, custom_frames: self.custom_frames }
+        return Spinner { state: core::state_tick(self.state), name: self.name, color: self.color, custom_frames: self.custom_frames, elapsed: self.elapsed, prefix: self.prefix, sep: self.sep }
     end
 
     pub fn set_message(self, msg: string) -> Spinner is
-        return Spinner { state: core::state_set_message(self.state, msg), name: self.name, color: self.color, custom_frames: self.custom_frames }
+        return Spinner { state: core::state_set_message(self.state, msg), name: self.name, color: self.color, custom_frames: self.custom_frames, elapsed: self.elapsed, prefix: self.prefix, sep: self.sep }
     end
 
     pub fn set_style(self, frame_set: string) -> Spinner is
-        return Spinner { state: self.state, name: frame_set, color: self.color, custom_frames: self.custom_frames }
+        return Spinner { state: self.state, name: frame_set, color: self.color, custom_frames: self.custom_frames, elapsed: self.elapsed, prefix: self.prefix, sep: self.sep }
     end
 
     pub fn set_custom_frames(self, frames: [string]) -> Spinner is
-        return Spinner { state: self.state, name: "custom", color: self.color, custom_frames: frames }
+        return Spinner { state: self.state, name: "custom", color: self.color, custom_frames: frames, elapsed: self.elapsed, prefix: self.prefix, sep: self.sep }
     end
 
     pub fn set_color(self, ansi_code: string) -> Spinner is
-        return Spinner { state: self.state, name: self.name, color: ansi_code, custom_frames: self.custom_frames }
+        return Spinner { state: self.state, name: self.name, color: ansi_code, custom_frames: self.custom_frames, elapsed: self.elapsed, prefix: self.prefix, sep: self.sep }
+    end
+
+    ;; Włącza / wyłącza licznik czasu `[16s]` między klatką a komunikatem.
+    pub fn with_elapsed(self, on: bool) -> Spinner is
+        return Spinner { state: self.state, name: self.name, color: self.color, custom_frames: self.custom_frames, elapsed: on, prefix: self.prefix, sep: self.sep }
+    end
+
+    ;; Znacznik przed komunikatem, np. kolorowe "H#". Może zawierać sekwencje ANSI.
+    pub fn set_prefix(self, prefix: string) -> Spinner is
+        return Spinner { state: self.state, name: self.name, color: self.color, custom_frames: self.custom_frames, elapsed: self.elapsed, prefix: prefix, sep: self.sep }
+    end
+
+    ;; Separator prefiks/komunikat (domyślnie "›"); "" = sama spacja.
+    pub fn set_separator(self, sep: string) -> Spinner is
+        return Spinner { state: self.state, name: self.name, color: self.color, custom_frames: self.custom_frames, elapsed: self.elapsed, prefix: self.prefix, sep: sep }
+    end
+
+    ;; Ile milisekund minęło od utworzenia spinnera.
+    pub fn elapsed_ms(self) -> int is
+        return core::state_elapsed_ms(self.state)
+    end
+
+    ;; Licznik czasu jako napis: "[16s]", "[1m04s]", "[1h02m]" (bez koloru, bez dopełnienia).
+    pub fn elapsed_label(self) -> string is
+        return "[" + human::format_elapsed_compact(core::state_elapsed_ms(self.state)) + "]"
     end
 
     pub fn frame(self) -> string is
@@ -69,24 +126,78 @@ impl Spinner is
         return spinner_frames::spinner_frame_at(frames, core::state_tick_count(self.state))
     end
 
-    pub fn line(self) -> string is
-        let glyph: string = self.frame()
-        if self.color == "" is
-            return glyph + " " + core::state_message(self.state)
+    ;; Wspólny układ linii dla klatki, ✓ i ✗:
+    ;;   bez licznika i prefiksu (zachowanie sprzed 1.1):   `glyph msg`
+    ;;   z licznikiem i/lub prefiksem:                      `glyph  [16s]  prefix › msg`
+    fn compose(self, glyph: string, msg: string) -> string is
+        if !self.elapsed && self.prefix == "" is
+            return glyph + " " + msg
         end
-        return "\x1b[" + self.color + "m" + glyph + "\x1b[0m " + core::state_message(self.state)
+        let mut out: string = glyph + "  "
+        if self.elapsed is
+            let label: string = self.elapsed_label()
+            let pad: int = elapsed_field_width() - string_len(label)
+            out += paint("2", label)
+            if pad > 0 is out += string_repeat(" ", pad) end
+            out += "  "
+        end
+        if self.prefix != "" is
+            out += self.prefix
+            if self.sep == "" is
+                out += " "
+            else is
+                out += " " + paint("2", self.sep) + " "
+            end
+        end
+        return out + msg
+    end
+
+    pub fn line(self) -> string is
+        return self.compose(paint(self.color, self.frame()), core::state_message(self.state))
     end
 
     ;; Rysuje bieżącą klatkę w miejscu — wywołuj po każdym `tick()`.
+    ;; `\x1b[2K` czyści całą linię (po dłuższej poprzedniej klatce nie zostaje ogon), a `io_flush()`
+    ;; jest KONIECZNY: klatka nie kończy się `\n`, więc stdout na terminalu (buforowany liniowo)
+    ;; trzymałby ją w buforze i spinner pokazywałby się dopiero hurtem po zapełnieniu bufora.
     pub fn draw(self) is
-        io_print("\r  " + self.line() + "                    ")
+        io_print("\r\x1b[2K  " + self.line())
+        io_flush()
     end
 
+    ;; Końcowa linia sukcesu jako napis (to, co `finish` wypisuje, bez wcięcia i bez `\n`).
+    pub fn finish_text(self, done_msg: string) -> string is
+        return self.compose("\x1b[32m✓\x1b[0m", done_msg)
+    end
+
+    ;; Końcowa linia błędu jako napis.
+    pub fn fail_text(self, err_msg: string) -> string is
+        return self.compose("\x1b[31m✗\x1b[0m", err_msg)
+    end
+
+    ;; Zamyka spinner linią `✓  [18s]  prefix › komunikat` (czas zamrożony w chwili wywołania).
     pub fn finish(self, done_msg: string) is
-        io_print("\r  \x1b[32m✓\x1b[0m " + done_msg + "                    \n")
+        io_print("\r\x1b[2K  " + self.finish_text(done_msg) + "\n")
+        io_flush()
     end
 
     pub fn fail(self, err_msg: string) is
-        io_print("\r  \x1b[31m✗\x1b[0m " + err_msg + "                    \n")
+        io_print("\r\x1b[2K  " + self.fail_text(err_msg) + "\n")
+        io_flush()
     end
+end
+
+#[test]
+fn test_spinner_compose_legacy() is
+    let sp: Spinner = spinner_new("praca").set_color("")
+    test::assert_contains(sp.line(), " praca")
+    test::assert_contains(sp.finish_text("gotowe"), "✓\x1b[0m gotowe")
+end
+
+#[test]
+fn test_spinner_compose_timed() is
+    let sp: Spinner = spinner_timed("H#", "bit").set_color("")
+    let l: string = sp.line()
+    test::assert_contains(l, "[0s]")
+    test::assert_contains(l, "H# \x1b[2m›\x1b[0m bit")
 end
