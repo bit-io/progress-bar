@@ -67,6 +67,18 @@ pub fn quick_spinner(msg: string) -> spinner::Spinner is
     return spinner::spinner_new(msg)
 end
 
+;; Spinner z licznikiem czasu i prefiksem: `⠹  [16s]  prefix › msg` (jak w `bit`).
+;; `prefix` może zawierać ANSI (np. kolorowe "H#"); "" = bez prefiksu.
+pub fn quick_spinner_timed(prefix: string, msg: string) -> spinner::Spinner is
+    return spinner::spinner_timed(prefix, msg)
+end
+
+;; Czas jako pole licznika: "[16s]", "[1m04s]", "[1h02m]" (bez koloru). Ten sam format co `with_elapsed`,
+;; do ręcznie składanych linii (np. gdy nie ma terminala i spinner się nie rysuje).
+pub fn format_elapsed_label(ms: int) -> string is
+    return "[" + human::format_elapsed_compact(ms) + "]"
+end
+
 ;; Spinner z wybranym zestawem klatek (patrz spinner_frames::spinner_names()).
 pub fn quick_spinner_styled(msg: string, frame_set: string) -> spinner::Spinner is
     return spinner::spinner_with_style(msg, frame_set)
@@ -90,5 +102,5 @@ end
 
 ;; Wersja biblioteki (przydatne w `--version`/diagnostyce własnych narzędzi).
 pub fn version() -> string is
-    return "1.0.0"
+    return "1.1.0"
 end
