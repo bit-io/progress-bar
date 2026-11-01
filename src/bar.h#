@@ -84,6 +84,7 @@ impl ProgressBar is
     ;; standardowy tryb pracy w pętli: `pb = pb.inc(1); pb.draw()`.
     pub fn draw(self) is
         io_print("\r" + self.line() + "                    ")
+        io_flush()    ;; bez \n stdout na terminalu jest buforowany liniowo — bez flush klatki wychodzą hurtem
     end
 
     ;; Ponownie rysuje pasek BEZ zmiany postępu — do przywracania go na
@@ -95,6 +96,7 @@ impl ProgressBar is
     ;; Czyści bieżącą linię (miejsce na "prawdziwy", stały log obok paska).
     pub fn clear(self) is
         io_print("\r" + string_repeat(" ", 120) + "\r")
+        io_flush()
     end
 
     pub fn is_done(self) -> bool is
